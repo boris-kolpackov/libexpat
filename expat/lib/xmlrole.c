@@ -187,6 +187,10 @@ prolog2(PROLOG_STATE *state,
         const char *end,
         const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_NONE;
@@ -208,6 +212,10 @@ doctype0(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_DOCTYPE_NONE;
@@ -256,6 +264,10 @@ doctype2(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_DOCTYPE_NONE;
@@ -273,6 +285,10 @@ doctype3(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_DOCTYPE_NONE;
@@ -290,6 +306,10 @@ doctype4(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_DOCTYPE_NONE;
@@ -310,6 +330,10 @@ doctype5(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_DOCTYPE_NONE;
@@ -429,6 +453,10 @@ entity0(PROLOG_STATE *state,
         const char *end,
         const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ENTITY_NONE;
@@ -449,6 +477,10 @@ entity1(PROLOG_STATE *state,
         const char *end,
         const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ENTITY_NONE;
@@ -494,6 +526,10 @@ entity3(PROLOG_STATE *state,
         const char *end,
         const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ENTITY_NONE;
@@ -511,6 +547,10 @@ entity4(PROLOG_STATE *state,
         const char *end,
         const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ENTITY_NONE;
@@ -551,6 +591,10 @@ entity6(PROLOG_STATE *state,
         const char *end,
         const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ENTITY_NONE;
@@ -597,6 +641,10 @@ entity8(PROLOG_STATE *state,
         const char *end,
         const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ENTITY_NONE;
@@ -614,6 +662,10 @@ entity9(PROLOG_STATE *state,
         const char *end,
         const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ENTITY_NONE;
@@ -631,6 +683,10 @@ entity10(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ENTITY_NONE;
@@ -648,6 +704,10 @@ notation0(PROLOG_STATE *state,
           const char *end,
           const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_NOTATION_NONE;
@@ -689,6 +749,10 @@ notation2(PROLOG_STATE *state,
           const char *end,
           const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_NOTATION_NONE;
@@ -706,6 +770,10 @@ notation3(PROLOG_STATE *state,
           const char *end,
           const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_NOTATION_NONE;
@@ -724,6 +792,10 @@ notation4(PROLOG_STATE *state,
           const char *end,
           const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_NOTATION_NONE;
@@ -745,6 +817,10 @@ attlist0(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ATTLIST_NONE;
@@ -763,6 +839,10 @@ attlist1(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ATTLIST_NONE;
@@ -825,6 +905,10 @@ attlist3(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ATTLIST_NONE;
@@ -844,6 +928,10 @@ attlist4(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ATTLIST_NONE;
@@ -864,6 +952,10 @@ attlist5(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ATTLIST_NONE;
@@ -881,6 +973,10 @@ attlist6(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ATTLIST_NONE;
@@ -898,6 +994,10 @@ attlist7(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ATTLIST_NONE;
@@ -959,6 +1059,10 @@ attlist9(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ATTLIST_NONE;
@@ -976,6 +1080,10 @@ element0(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ELEMENT_NONE;
@@ -1064,6 +1172,10 @@ element3(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ELEMENT_NONE;
@@ -1089,6 +1201,10 @@ element4(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ELEMENT_NONE;
@@ -1107,6 +1223,10 @@ element5(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ELEMENT_NONE;
@@ -1128,6 +1248,10 @@ element6(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ELEMENT_NONE;
@@ -1158,6 +1282,10 @@ element7(PROLOG_STATE *state,
          const char *end,
          const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_ELEMENT_NONE;
@@ -1232,6 +1360,10 @@ condSect1(PROLOG_STATE *state,
           const char *end,
           const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_NONE;
@@ -1250,6 +1382,10 @@ condSect2(PROLOG_STATE *state,
           const char *end,
           const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return XML_ROLE_NONE;
@@ -1269,6 +1405,10 @@ declClose(PROLOG_STATE *state,
           const char *end,
           const ENCODING *enc)
 {
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   switch (tok) {
   case XML_TOK_PROLOG_S:
     return state->role_none;
@@ -1286,6 +1426,12 @@ error(PROLOG_STATE *state,
       const char *end,
       const ENCODING *enc)
 {
+  UNUSED(state);
+  UNUSED(tok);
+  UNUSED(ptr);
+  UNUSED(end);
+  UNUSED(enc);
+
   return XML_ROLE_NONE;
 }
 
