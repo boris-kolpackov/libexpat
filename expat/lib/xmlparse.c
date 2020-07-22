@@ -7,12 +7,14 @@
 #include <assert.h>
 #include <limits.h>                     /* UINT_MAX */
 
+#ifndef XML_FREESTANDING
 #ifdef COMPILED_FROM_DSP
 #define getpid GetCurrentProcessId
 #else
 #include <sys/time.h>                   /* gettimeofday() */
 #include <sys/types.h>                  /* getpid() */
 #include <unistd.h>                     /* getpid() */
+#endif
 #endif
 
 #define XML_BUILDING_EXPAT 1
@@ -687,6 +689,7 @@ static const XML_Char implicitContext[] = {
   ASCII_s, ASCII_p, ASCII_a, ASCII_c, ASCII_e, '\0'
 };
 
+#ifndef XML_FREESTANDING
 static size_t
 gather_time_entropy(void)
 {
@@ -705,14 +708,19 @@ gather_time_entropy(void)
   return tv.tv_usec;
 #endif
 }
+#endif
 
 static size_t
 generate_hash_secret_salt(XML_Parser parser)
 {
+#ifdef XML_FREESTANDING
+  const size_t entropy = (size_t)&parser ^ (size_t)parser;
+#else
   /* Process ID is 0 bits entropy if attacker has local access
    * XML_Parser address is few bits of entropy if attacker has local access */
   const size_t entropy =
       gather_time_entropy() ^ getpid() ^ (size_t)parser;
+#endif
 
   /* Factors are 2^31-1 and 2^61-1 (Mersenne primes M31 and M61) */
   if (sizeof(size_t) == 4) {
