@@ -1,0 +1,30 @@
+#ifndef EXPAT_CONFIG_H
+#define EXPAT_CONFIG_H
+
+#define BYTEORDER 1234
+/* #define BYTEORDER 4321 */
+
+#define XML_NS 1
+#define XML_DTD 1
+#define XML_CONTEXT_BYTES 1024
+
+#define UNUSED(x) (void)x;
+
+#ifdef _WIN32
+/* Windows
+ *
+ */
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef WIN32_LEAN_AND_MEAN
+
+#define HAVE_MEMMOVE 1
+
+#else
+/* POSIX
+ *
+ */
+#define HAVE_MEMMOVE 1
+#endif
+
+#endif /* EXPAT_CONFIG_H */
