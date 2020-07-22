@@ -243,7 +243,7 @@ typedef struct {
 
 typedef struct {
   unsigned long version;
-  unsigned long hash;
+  size_t hash;
   const XML_Char *uriName;
 } NS_ATT;
 
@@ -429,7 +429,7 @@ static ELEMENT_TYPE *
 getElementType(XML_Parser parser, const ENCODING *enc,
                const char *ptr, const char *end);
 
-static unsigned long generate_hash_secret_salt(XML_Parser parser);
+static size_t generate_hash_secret_salt(XML_Parser parser);
 static XML_Bool startParsing(XML_Parser parser);
 
 static XML_Parser
@@ -553,7 +553,7 @@ struct XML_ParserStruct {
   XML_Bool m_useForeignDTD;
   enum XML_ParamEntityParsing m_paramEntityParsing;
 #endif
-  unsigned long m_hash_secret_salt;
+  size_t m_hash_secret_salt;
 };
 
 #define MALLOC(s) (parser->m_mem.malloc_fcn((s)))
@@ -687,7 +687,7 @@ static const XML_Char implicitContext[] = {
   ASCII_s, ASCII_p, ASCII_a, ASCII_c, ASCII_e, '\0'
 };
 
-static unsigned long
+static size_t
 gather_time_entropy(void)
 {
 #ifdef COMPILED_FROM_DSP
@@ -706,19 +706,19 @@ gather_time_entropy(void)
 #endif
 }
 
-static unsigned long
+static size_t
 generate_hash_secret_salt(XML_Parser parser)
 {
   /* Process ID is 0 bits entropy if attacker has local access
    * XML_Parser address is few bits of entropy if attacker has local access */
-  const unsigned long entropy =
-      gather_time_entropy() ^ getpid() ^ (unsigned long)parser;
+  const size_t entropy =
+      gather_time_entropy() ^ getpid() ^ (size_t)parser;
 
   /* Factors are 2^31-1 and 2^61-1 (Mersenne primes M31 and M61) */
-  if (sizeof(unsigned long) == 4) {
-    return entropy * 2147483647;
+  if (sizeof(size_t) == 4) {
+    return entropy * (size_t)2147483647;
   } else {
-    return entropy * 2305843009213693951;
+    return entropy * (size_t)2305843009213693951;
   }
 }
 
@@ -1052,7 +1052,7 @@ XML_ExternalEntityParserCreate(XML_Parser oldParser,
      from hash tables associated with either parser without us having
      to worry which hash secrets each table has.
   */
-  unsigned long oldhash_secret_salt = hash_secret_salt;
+  size_t oldhash_secret_salt = hash_secret_salt;
 
 #ifdef XML_DTD
   if (!context)
@@ -1511,7 +1511,7 @@ XML_SetParamEntityParsing(XML_Parser parser,
 
 int XMLCALL
 XML_SetHashSalt(XML_Parser parser,
-                unsigned long hash_salt)
+                unsigned long hash_salt) /* should be size_t */
 {
   /* block after XML_Parse()/XML_ParseBuffer() has been called */
   if (ps_parsing == XML_PARSING || ps_parsing == XML_SUSPENDED)
@@ -2925,7 +2925,7 @@ storeAtts(XML_Parser parser, const ENCODING *enc,
      and clear flags that say whether attributes were specified */
   i = 0;
   if (nPrefixes) {
-    int j;  /* hash table index */
+    size_t j;  /* hash table index */
     unsigned long version = nsAttsVersion;
     int nsAttsSize = (int)1 << nsAttsPower;
     /* size of hash table must be at least 2 * (# of prefixed attributes) */
@@ -2956,7 +2956,7 @@ storeAtts(XML_Parser parser, const ENCODING *enc,
       if (s[-1] == 2) {  /* prefixed */
         ATTRIBUTE_ID *id;
         const BINDING *b;
-        unsigned long uriHash = hash_secret_salt;
+        size_t uriHash = hash_secret_salt;
         ((XML_Char *)s)[-1] = 0;  /* clear flag */
         id = (ATTRIBUTE_ID *)lookup(parser, &dtd->attributeIds, s, 0);
         b = id->prefix->binding;
@@ -2964,7 +2964,7 @@ storeAtts(XML_Parser parser, const ENCODING *enc,
           return XML_ERROR_UNBOUND_PREFIX;
 
         /* as we expand the name we also calculate its hash value */
-        for (j = 0; j < b->uriLen; j++) {
+        for (j = 0; j < (size_t)b->uriLen; j++) {
           const XML_Char c = b->uri[j];
           if (!poolAppendChar(&tempPool, c))
             return XML_ERROR_NO_MEMORY;
@@ -2983,7 +2983,7 @@ storeAtts(XML_Parser parser, const ENCODING *enc,
              Derived from code in lookup(parser, HASH_TABLE *table, ...).
           */
           unsigned char step = 0;
-          unsigned long mask = nsAttsSize - 1;
+          size_t mask = nsAttsSize - 1;
           j = uriHash & mask;  /* index into hash table */
           while (nsAtts[j].version == version) {
             /* for speed we compare stored hash values first */
@@ -6025,10 +6025,10 @@ keyeq(KEY s1, KEY s2)
   return XML_FALSE;
 }
 
-static unsigned long FASTCALL
+static size_t FASTCALL
 hash(XML_Parser parser, KEY s)
 {
-  unsigned long h = hash_secret_salt;
+  size_t h = hash_secret_salt;
   while (*s)
     h = CHAR_HASH(h, *s++);
   return h;
@@ -6055,8 +6055,8 @@ lookup(XML_Parser parser, HASH_TABLE *table, KEY name, size_t createSize)
     i = hash(parser, name) & ((unsigned long)table->size - 1);
   }
   else {
-    unsigned long h = hash(parser, name);
-    unsigned long mask = (unsigned long)table->size - 1;
+    size_t h = hash(parser, name);
+    size_t mask = table->size - 1;
     unsigned char step = 0;
     i = h & mask;
     while (table->v[i]) {
@@ -6073,7 +6073,7 @@ lookup(XML_Parser parser, HASH_TABLE *table, KEY name, size_t createSize)
     if (table->used >> (table->power - 1)) {
       unsigned char newPower = table->power + 1;
       size_t newSize = (size_t)1 << newPower;
-      unsigned long newMask = (unsigned long)newSize - 1;
+      size_t newMask = newSize - 1;
       size_t tsize = newSize * sizeof(NAMED *);
       NAMED **newV = (NAMED **)table->mem->malloc_fcn(tsize);
       if (!newV)
@@ -6081,7 +6081,7 @@ lookup(XML_Parser parser, HASH_TABLE *table, KEY name, size_t createSize)
       memset(newV, 0, tsize);
       for (i = 0; i < table->size; i++)
         if (table->v[i]) {
-          unsigned long newHash = hash(parser, table->v[i]->name);
+          size_t newHash = hash(parser, table->v[i]->name);
           size_t j = newHash & newMask;
           step = 0;
           while (newV[j]) {
