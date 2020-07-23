@@ -11,7 +11,7 @@ CFLAGS := -Wall -Wextra
 all: $(src:.c=.o)
 
 %.o: %.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<
+	$(CC) $(CPPFLAGS) $(CFLAGS) -I. -DHAVE_EXPAT_CONFIG_H -c $<
 
 # Clean.
 #
