@@ -7,16 +7,6 @@
 #include <assert.h>
 #include <limits.h>                     /* UINT_MAX */
 
-#ifndef XML_FREESTANDING
-#ifdef COMPILED_FROM_DSP
-#define getpid GetCurrentProcessId
-#else
-#include <sys/time.h>                   /* gettimeofday() */
-#include <sys/types.h>                  /* getpid() */
-#include <unistd.h>                     /* getpid() */
-#endif
-#endif
-
 #define XML_BUILDING_EXPAT 1
 
 #ifdef COMPILED_FROM_DSP
@@ -30,6 +20,16 @@
 #elif defined(HAVE_EXPAT_CONFIG_H)
 #include <expat_config.h>
 #endif /* ndef COMPILED_FROM_DSP */
+
+#ifndef XML_FREESTANDING
+#ifdef COMPILED_FROM_DSP
+#define getpid GetCurrentProcessId
+#else
+#include <sys/time.h>                   /* gettimeofday() */
+#include <sys/types.h>                  /* getpid() */
+#include <unistd.h>                     /* getpid() */
+#endif
+#endif
 
 #include "ascii.h"
 #include "expat.h"
