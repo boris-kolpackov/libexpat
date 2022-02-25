@@ -152,6 +152,10 @@ dummy_start_element(void *userData,
                     const XML_Char *name, const XML_Char **atts)
 {}
 
+static void XMLCALL
+dummy_end_element(void *userData, const XML_Char *name)
+{
+}
 
 /*
  * Character & encoding tests.
@@ -370,7 +374,7 @@ END_TEST
 START_TEST(test_utf16_le_epilog_newline)
 {
     unsigned int first_chunk_bytes = 17;
-    char text[] = 
+    char text[] =
         "\xFF\xFE"                      /* BOM */
         "<\000e\000/\000>\000"          /* document element */
         "\r\000\n\000\r\000\n\000";     /* epilog */
@@ -409,7 +413,7 @@ END_TEST
 
 /* Regression test #1 for SF bug #653180. */
 START_TEST(test_line_number_after_parse)
-{  
+{
     char *text =
         "<tag>\n"
         "\n"
@@ -421,7 +425,7 @@ START_TEST(test_line_number_after_parse)
     lineno = XML_GetCurrentLineNumber(parser);
     if (lineno != 4) {
         char buffer[100];
-        sprintf(buffer, 
+        sprintf(buffer,
             "expected 4 lines, saw %" XML_FMT_INT_MOD "u", lineno);
         fail(buffer);
     }
@@ -439,7 +443,7 @@ START_TEST(test_column_number_after_parse)
     colno = XML_GetCurrentColumnNumber(parser);
     if (colno != 11) {
         char buffer[100];
-        sprintf(buffer, 
+        sprintf(buffer,
             "expected 11 columns, saw %" XML_FMT_INT_MOD "u", colno);
         fail(buffer);
     }
@@ -507,7 +511,7 @@ START_TEST(test_line_and_column_numbers_inside_handlers)
     if (XML_Parse(parser, text, strlen(text), XML_TRUE) == XML_STATUS_ERROR)
         xml_failure(parser);
 
-    CharData_CheckString(&storage, expected); 
+    CharData_CheckString(&storage, expected);
 }
 END_TEST
 
@@ -530,7 +534,7 @@ START_TEST(test_line_number_after_error)
     }
 }
 END_TEST
-    
+
 /* Regression test #5 for SF bug #653180. */
 START_TEST(test_column_number_after_error)
 {
@@ -543,9 +547,9 @@ START_TEST(test_column_number_after_error)
         fail("Expected a parse error");
 
     colno = XML_GetCurrentColumnNumber(parser);
-    if (colno != 4) { 
+    if (colno != 4) {
         char buffer[100];
-        sprintf(buffer, 
+        sprintf(buffer,
             "expected 4 columns, saw %" XML_FMT_INT_MOD "u", colno);
         fail(buffer);
     }
@@ -1363,7 +1367,7 @@ external_entity_handler(XML_Parser parser,
                         const XML_Char *context,
                         const XML_Char *base,
                         const XML_Char *systemId,
-                        const XML_Char *publicId) 
+                        const XML_Char *publicId)
 {
     intptr_t callno = 1 + (intptr_t)XML_GetUserData(parser);
     char *text;
@@ -1521,6 +1525,35 @@ START_TEST(test_ns_unbound_prefix_on_element)
 }
 END_TEST
 
+START_TEST(test_ns_separator_in_uri) {
+  struct test_case {
+    enum XML_Status expectedStatus;
+    const char *doc;
+  };
+  struct test_case cases[] = {
+      {XML_STATUS_OK, "<doc xmlns='one_two' />"},
+      {XML_STATUS_ERROR, "<doc xmlns='one&#x0A;two' />"},
+  };
+
+  size_t i = 0;
+  size_t failCount = 0;
+  for (; i < sizeof(cases) / sizeof(cases[0]); i++) {
+    XML_Parser parser = XML_ParserCreateNS(NULL, '\n');
+    XML_SetElementHandler(parser, dummy_start_element, dummy_end_element);
+    if (XML_Parse(parser, cases[i].doc, (int)strlen(cases[i].doc),
+                  /*isFinal*/ XML_TRUE)
+        != cases[i].expectedStatus) {
+      failCount++;
+    }
+    XML_ParserFree(parser);
+  }
+
+  if (failCount) {
+    fail("Namespace separator handling is broken");
+  }
+}
+END_TEST
+
 static Suite *
 make_suite(void)
 {
@@ -1590,6 +1623,7 @@ make_suite(void)
     tcase_add_test(tc_namespace, test_ns_duplicate_attrs_diff_prefixes);
     tcase_add_test(tc_namespace, test_ns_unbound_prefix_on_attribute);
     tcase_add_test(tc_namespace, test_ns_unbound_prefix_on_element);
+    tcase_add_test(tc_namespace, test_ns_separator_in_uri);
 
     return s;
 }
