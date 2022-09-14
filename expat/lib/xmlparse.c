@@ -442,6 +442,9 @@ static ELEMENT_TYPE *
 getElementType(XML_Parser parser, const ENCODING *enc,
                const char *ptr, const char *end);
 
+static XML_Char *copyString(const XML_Char *s,
+                            const XML_Memory_Handling_Suite *memsuite);
+
 static size_t generate_hash_secret_salt(XML_Parser parser);
 static XML_Bool startParsing(XML_Parser parser);
 
@@ -754,6 +757,8 @@ parserCreate(const XML_Char *encodingName,
   parser->m_nsAttsVersion = 0;
   parser->m_nsAttsPower = 0;
 
+  parser->m_protocolEncodingName = NULL;
+
   poolInit(&parser->m_tempPool, &(parser->m_mem));
   poolInit(&parser->m_temp2Pool, &(parser->m_mem));
   parserInit(parser, encodingName);
@@ -780,9 +785,9 @@ parserInit(XML_Parser parser, const XML_Char *encodingName)
 {
   parser->m_processor = prologInitProcessor;
   XmlPrologStateInit(&parser->m_prologState);
-  parser->m_protocolEncodingName = (encodingName != NULL
-                          ? poolCopyString(&parser->m_tempPool, encodingName)
-                          : NULL);
+  if (encodingName != NULL) {
+    parser->m_protocolEncodingName = copyString(encodingName, &(parser->m_mem));
+  }
   parser->m_curBase = NULL;
   XmlInitEncoding(&parser->m_initEncoding, &parser->m_encoding, 0);
   parser->m_userData = NULL;
@@ -891,6 +896,8 @@ XML_ParserReset(XML_Parser parser, const XML_Char *encodingName)
     parser->m_unknownEncodingRelease(parser->m_unknownEncodingData);
   poolClear(&parser->m_tempPool);
   poolClear(&parser->m_temp2Pool);
+  FREE(parser, (void *)parser->m_protocolEncodingName);
+  parser->m_protocolEncodingName = NULL;
   parserInit(parser, encodingName);
   dtdReset(parser->m_dtd, &parser->m_mem);
   return XML_TRUE;
@@ -903,12 +910,19 @@ XML_SetEncoding(XML_Parser parser, const XML_Char *encodingName)
      XXX There's no way for the caller to determine which of the
      XXX possible error cases caused the XML_STATUS_ERROR return.
   */
-  if (parser->m_parsingStatus.parsing == XML_PARSING || parser->m_parsingStatus.parsing == XML_SUSPENDED)
+  if (parser->m_parsingStatus.parsing == XML_PARSING
+      || parser->m_parsingStatus.parsing == XML_SUSPENDED)
     return XML_STATUS_ERROR;
+
+  /* Get rid of any previous encoding name */
+  FREE(parser, (void *)parser->m_protocolEncodingName);
+
   if (encodingName == NULL)
+    /* No new encoding name */
     parser->m_protocolEncodingName = NULL;
   else {
-    parser->m_protocolEncodingName = poolCopyString(&parser->m_tempPool, encodingName);
+    /* Copy the new encoding name into allocated memory */
+    parser->m_protocolEncodingName = copyString(encodingName, &(parser->m_mem));
     if (!parser->m_protocolEncodingName)
       return XML_STATUS_ERROR;
   }
@@ -1099,6 +1113,7 @@ XML_ParserFree(XML_Parser parser)
   destroyBindings(parser->m_inheritedBindings, parser);
   poolDestroy(&parser->m_tempPool);
   poolDestroy(&parser->m_temp2Pool);
+  FREE(parser, (void *)parser->m_protocolEncodingName);
 #ifdef XML_DTD
   /* external parameter entity parsers share the DTD structure
      parser->m_dtd with the root parser, so we must not destroy it
@@ -3607,6 +3622,7 @@ initializeEncoding(XML_Parser parser)
   const char *s;
 #ifdef XML_UNICODE
   char encodingBuf[128];
+  /* See comments about `protocolEncodingName` in parserInit() */
   if (!parser->m_protocolEncodingName)
     s = NULL;
   else {
@@ -6768,4 +6784,25 @@ getElementType(XML_Parser parser,
       return NULL;
   }
   return ret;
+}
+
+static XML_Char *
+copyString(const XML_Char *s, const XML_Memory_Handling_Suite *memsuite) {
+  size_t charsRequired = 0;
+  XML_Char *result;
+
+  /* First determine how long the string is */
+  while (s[charsRequired] != 0) {
+    charsRequired++;
+  }
+  /* Include the terminator */
+  charsRequired++;
+
+  /* Now allocate space for the copy */
+  result = memsuite->malloc_fcn(charsRequired * sizeof(XML_Char));
+  if (result == NULL)
+    return NULL;
+  /* Copy the original into place */
+  memcpy(result, s, charsRequired * sizeof(XML_Char));
+  return result;
 }
