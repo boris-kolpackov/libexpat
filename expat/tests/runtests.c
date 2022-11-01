@@ -43,8 +43,21 @@
 # endif /* XML_UNICODE */
 #endif /* XML_UNICODE_WCHAR_T */
 
+#ifndef UNUSED_P
+#  define UNUSED_P(p) (void)p
+#endif
+
 static XML_Parser parser;
 
+static void
+tcase_add_test__ifdef_xml_dtd(TCase *tc, tcase_test_function test) {
+#ifdef XML_DTD
+  tcase_add_test(tc, test);
+#else
+  UNUSED_P(tc);
+  UNUSED_P(test);
+#endif
+}
 
 static void
 basic_setup(void)
@@ -1567,12 +1580,54 @@ START_TEST(test_ns_separator_in_uri) {
 }
 END_TEST
 
+static int XMLCALL
+external_entity_parser_create_alloc_fail_handler(XML_Parser parser,
+                                                 const XML_Char *context,
+                                                 const XML_Char *base,
+                                                 const XML_Char *systemId,
+                                                 const XML_Char *publicId) {
+  UNUSED_P(base);
+  UNUSED_P(systemId);
+  UNUSED_P(publicId);
+
+  if (context != NULL)
+    fail("Unexpected non-NULL context");
+
+  const XML_Char *const encodingName = XCS("UTF-8"); // needs something non-NULL
+  const XML_Parser ext_parser
+      = XML_ExternalEntityParserCreate(parser, context, encodingName);
+  if (ext_parser != NULL)
+    fail(
+        "Call to XML_ExternalEntityParserCreate was expected to fail out-of-memory");
+
+  return XML_STATUS_ERROR;
+}
+
+START_TEST(test_alloc_reset_after_external_entity_parser_create_fail) {
+  const char *const text = "<!DOCTYPE doc SYSTEM 'foo'><doc/>";
+
+  XML_SetExternalEntityRefHandler(
+      parser, external_entity_parser_create_alloc_fail_handler);
+  XML_SetParamEntityParsing(parser, XML_PARAM_ENTITY_PARSING_ALWAYS);
+
+  if (XML_Parse(parser, text, (int)strlen(text), XML_TRUE)
+      != XML_STATUS_ERROR)
+    fail("Call to parse was expected to fail");
+
+  if (XML_GetErrorCode(parser) != XML_ERROR_EXTERNAL_ENTITY_HANDLING)
+    fail("Call to parse was expected to fail from the external entity handler");
+
+  XML_ParserReset(parser, NULL);
+}
+END_TEST
+
 static Suite *
 make_suite(void)
 {
     Suite *s = suite_create("basic");
     TCase *tc_basic = tcase_create("basic tests");
     TCase *tc_namespace = tcase_create("XML namespaces");
+    TCase *tc_alloc = tcase_create("allocation tests");
 
     suite_add_tcase(s, tc_basic);
     tcase_add_checked_fixture(tc_basic, basic_setup, basic_teardown);
@@ -1637,6 +1692,9 @@ make_suite(void)
     tcase_add_test(tc_namespace, test_ns_unbound_prefix_on_attribute);
     tcase_add_test(tc_namespace, test_ns_unbound_prefix_on_element);
     tcase_add_test(tc_namespace, test_ns_separator_in_uri);
+
+    tcase_add_test__ifdef_xml_dtd(
+      tc_alloc, test_alloc_reset_after_external_entity_parser_create_fail);
 
     return s;
 }
