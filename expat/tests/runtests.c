@@ -1580,6 +1580,51 @@ START_TEST(test_ns_separator_in_uri) {
 }
 END_TEST
 
+/* Control variable; the number of times duff_allocator() will successfully
+ * allocate */
+#define ALLOC_ALWAYS_SUCCEED (-1)
+#define REALLOC_ALWAYS_SUCCEED (-1)
+
+static intptr_t allocation_count = ALLOC_ALWAYS_SUCCEED;
+static intptr_t reallocation_count = REALLOC_ALWAYS_SUCCEED;
+
+/* Crocked allocator for allocation failure tests */
+static void *
+duff_allocator(size_t size) {
+  if (allocation_count == 0)
+    return NULL;
+  if (allocation_count != ALLOC_ALWAYS_SUCCEED)
+    allocation_count--;
+  return malloc(size);
+}
+
+/* Crocked reallocator for allocation failure tests */
+static void *
+duff_reallocator(void *ptr, size_t size) {
+  if (reallocation_count == 0)
+    return NULL;
+  if (reallocation_count != REALLOC_ALWAYS_SUCCEED)
+    reallocation_count--;
+  return realloc(ptr, size);
+}
+
+static void
+alloc_setup(void) {
+  XML_Memory_Handling_Suite memsuite = {duff_allocator, duff_reallocator, free};
+
+  /* Ensure the parser creation will go through */
+  allocation_count = ALLOC_ALWAYS_SUCCEED;
+  reallocation_count = REALLOC_ALWAYS_SUCCEED;
+  parser = XML_ParserCreate_MM(NULL, &memsuite, NULL);
+  if (parser == NULL)
+    fail("Parser not created");
+}
+
+static void
+alloc_teardown(void) {
+  basic_teardown();
+}
+
 static int XMLCALL
 external_entity_parser_create_alloc_fail_handler(XML_Parser parser,
                                                  const XML_Char *context,
@@ -1720,6 +1765,8 @@ make_suite(void)
     tcase_add_checked_fixture(tc_misc, NULL, basic_teardown);
     tcase_add_test(tc_misc, test_misc_tag_mismatch_reset_leak);
 
+    suite_add_tcase(s, tc_alloc);
+    tcase_add_checked_fixture(tc_alloc, alloc_setup, alloc_teardown);
     tcase_add_test__ifdef_xml_dtd(
       tc_alloc, test_alloc_reset_after_external_entity_parser_create_fail);
 
