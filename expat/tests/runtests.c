@@ -1621,12 +1621,35 @@ START_TEST(test_alloc_reset_after_external_entity_parser_create_fail) {
 }
 END_TEST
 
+START_TEST(test_misc_tag_mismatch_reset_leak) {
+#ifdef XML_NS
+  const char *const text = "<open xmlns='https://namespace1.test'></close>";
+  XML_Parser parser = XML_ParserCreateNS(NULL, XCS('\n'));
+
+  if (XML_Parse(parser, text, (int)strlen(text), XML_TRUE) != XML_STATUS_ERROR)
+    fail("Call to parse was expected to fail");
+  if (XML_GetErrorCode(parser) != XML_ERROR_TAG_MISMATCH)
+    fail("Call to parse was expected to fail from a closing tag mismatch");
+
+  XML_ParserReset(parser, NULL);
+
+  if (XML_Parse(parser, text, (int)strlen(text), XML_TRUE) != XML_STATUS_ERROR)
+    fail("Call to parse was expected to fail");
+  if (XML_GetErrorCode(parser) != XML_ERROR_TAG_MISMATCH)
+    fail("Call to parse was expected to fail from a closing tag mismatch");
+
+  XML_ParserFree(parser);
+#endif
+}
+END_TEST
+
 static Suite *
 make_suite(void)
 {
     Suite *s = suite_create("basic");
     TCase *tc_basic = tcase_create("basic tests");
     TCase *tc_namespace = tcase_create("XML namespaces");
+    TCase *tc_misc = tcase_create("miscellaneous tests");
     TCase *tc_alloc = tcase_create("allocation tests");
 
     suite_add_tcase(s, tc_basic);
@@ -1692,6 +1715,10 @@ make_suite(void)
     tcase_add_test(tc_namespace, test_ns_unbound_prefix_on_attribute);
     tcase_add_test(tc_namespace, test_ns_unbound_prefix_on_element);
     tcase_add_test(tc_namespace, test_ns_separator_in_uri);
+
+    suite_add_tcase(s, tc_misc);
+    tcase_add_checked_fixture(tc_misc, NULL, basic_teardown);
+    tcase_add_test(tc_misc, test_misc_tag_mismatch_reset_leak);
 
     tcase_add_test__ifdef_xml_dtd(
       tc_alloc, test_alloc_reset_after_external_entity_parser_create_fail);
