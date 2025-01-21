@@ -118,10 +118,10 @@ typedef struct {
 */
 #ifdef XML_UNICODE
 #define CHAR_HASH(h, c) \
-  (((h) * 0xF4243) ^ (unsigned short)(c))
+  (((h) * (size_t)0xF4243) ^ (unsigned short)(c))
 #else
 #define CHAR_HASH(h, c) \
-  (((h) * 0xF4243) ^ (unsigned char)(c))
+  (((h) * (size_t)0xF4243) ^ (unsigned char)(c))
 #endif
 
 /* For probing (after a collision) we need a step size relative prime
